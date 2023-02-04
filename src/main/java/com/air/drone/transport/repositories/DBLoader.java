@@ -11,6 +11,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
+
 @Configuration
 public class DBLoader {
     private static final Logger log = LoggerFactory.getLogger(DBLoader.class);
@@ -26,9 +28,9 @@ public class DBLoader {
     @Bean
     CommandLineRunner initDatabase(DroneRepository droneRepository, ItemRepository itemRepository) {
         return args -> {
-            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.HEAVY_WEIGHT, 20.3, "ZSSZSJFU_DHJ234")));
-            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.MIDDLE_WEIGHT, 100.0, "ZAAZSJFU_DESF4")));
-            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.LIGHT_WEIGHT, 80.3, "SSDFFFU_DHJ234")));
+            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.HEAVY_WEIGHT, new BigDecimal("20.00"), "ZSSZSJFU_DHJ234")));
+            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.MIDDLE_WEIGHT, new BigDecimal("80.00"), "ZAAZSJFU_DESF4")));
+            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.LIGHT_WEIGHT, new BigDecimal("100.00"), "SSDFFFU_DHJ234")));
             log.info("Adding item " + itemRepository.save(new Item("Sugar", "S123", 1500, "")));
             log.info("Adding item " + itemRepository.save(new Item("Vaccine", "V12_EDDE", 11, "")));
         };

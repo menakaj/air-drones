@@ -124,7 +124,7 @@ public class DispatchController {
             default:
                 break;
         }
-        if (drone.getBatteryCapacity() < 25) {
+        if (drone.getBatteryCapacity().floatValue() < 25) {
             throw new LowBatteryException(droneId);
         }
         drone.setState(DroneState.DELIVERING);

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -29,7 +30,7 @@ public class DroneStatusChecker {
 
         for(Drone d : drones) {
             if (d.getState() != DroneState.IDLE) {
-                d.setBatteryCapacity(d.getBatteryCapacity() - 1.0);
+                d.setBatteryCapacity(BigDecimal.valueOf(d.getBatteryCapacity().floatValue() - 1.0));
                 droneService.updateDrone(d);
             }
         }
@@ -46,7 +47,7 @@ public class DroneStatusChecker {
                             d.getSerialNumber(),
                             d.getId(),
                             d.getState().name(),
-                            d.getBatteryCapacity()
+                            d.getBatteryCapacity().floatValue()
                     )
             );
         }

@@ -4,8 +4,8 @@ import com.air.drone.transport.item.Item;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +32,10 @@ public class Drone {
 
     private DroneState state = DroneState.IDLE;
 
-    private double batteryCapacity;
+    @Digits(integer = 3, fraction = 2)
+    @DecimalMax("100.00")
+    @DecimalMin("0.00")
+    private BigDecimal batteryCapacity;
 
     @OneToMany(
             cascade = CascadeType.PERSIST,
@@ -51,7 +54,7 @@ public class Drone {
 
     public Drone(){}
 
-    public Drone(DroneModelType model, double batteryCapacity, String serialNumber) {
+    public Drone(DroneModelType model, BigDecimal batteryCapacity, String serialNumber) {
         this.model = model;
         this.batteryCapacity =  batteryCapacity;
         this.serialNumber = serialNumber;
@@ -73,11 +76,11 @@ public class Drone {
         this.serialNumber = serialNumber;
     }
 
-    public double getBatteryCapacity() {
+    public BigDecimal getBatteryCapacity() {
         return batteryCapacity;
     }
 
-    public void setBatteryCapacity(double batteryCapacity) {
+    public void setBatteryCapacity(BigDecimal batteryCapacity) {
         this.batteryCapacity = batteryCapacity;
     }
 
@@ -101,7 +104,7 @@ public class Drone {
         return (this.state == DroneState.IDLE
                 || this.state == DroneState.LOADING
                 || this.state == DroneState.LOADED)
-                && this.batteryCapacity >= 25.0;
+                && this.batteryCapacity.floatValue() >= new BigDecimal("20.00").floatValue();
     }
 
     public void addItem(Item item) {
