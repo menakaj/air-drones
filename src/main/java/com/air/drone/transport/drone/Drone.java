@@ -24,9 +24,10 @@ public class Drone {
     private double batteryCapacity;
 
     @OneToMany(
-            cascade = CascadeType.ALL,
+            cascade = CascadeType.PERSIST,
             fetch = FetchType.EAGER,
-            mappedBy = "drone"
+            mappedBy = "drone",
+            orphanRemoval = true
     )
     @JsonManagedReference
     private Set<Item> items = new HashSet<>();

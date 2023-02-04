@@ -2,11 +2,11 @@ package com.air.drone.transport.controllers;
 
 import com.air.drone.transport.assemblers.DroneAssembler;
 import com.air.drone.transport.drone.Drone;
+import com.air.drone.transport.drone.DroneService;
 import com.air.drone.transport.drone.DroneState;
 import com.air.drone.transport.exceptions.*;
 import com.air.drone.transport.item.Item;
-import com.air.drone.transport.drone.DroneRepository;
-import com.air.drone.transport.item.ItemRepository;
+import com.air.drone.transport.item.ItemService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -23,34 +23,31 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/dispatcher/v1")
 public class DispatchController {
 
-    private final DroneRepository droneRepository;
-    private final ItemRepository itemRepository;
+    private final DroneService droneService;
+    private final ItemService itemService;
 
     private final DroneAssembler droneAssembler;
 
-    public DispatchController(DroneRepository droneRepository, ItemRepository itemRepository,
+    public DispatchController(DroneService droneService, ItemService itemService,
                               DroneAssembler droneAssembler) {
-        this.droneRepository = droneRepository;
-        this.itemRepository = itemRepository;
+        this.droneService = droneService;
+        this.itemService = itemService;
         this.droneAssembler = droneAssembler;
     }
 
     @PostMapping("/drones/register")
     @ResponseStatus(HttpStatus.CREATED)
     public EntityModel<Drone> registerDrone(@RequestBody Drone drone) {
-        return droneAssembler.toModel(droneRepository.saveAndFlush(drone));
+        return droneAssembler.toModel(droneService.addDrone(drone));
     }
 
     @GetMapping("/drones")
     public CollectionModel<EntityModel<Drone>> getDrones(
             @RequestParam(required = false, name = "available") String available) {
-        List<EntityModel<Drone>> drones = droneRepository.findAll().stream().filter(drone -> {
-            if (available == null) {
-                return true;
-            }
-            return !"true".equalsIgnoreCase(available) || drone.isAvailable();
-        }).map(droneAssembler::toModel).collect(Collectors.toList());
-        drones.forEach(System.out::println);
+        List<EntityModel<Drone>> drones = droneService.getDrones(available)
+                .stream()
+                .map(droneAssembler::toModel)
+                .collect(Collectors.toList());
         return CollectionModel.of(
                 drones,
                 linkTo(methodOn(DispatchController.class).getDrones("true")).withSelfRel()
@@ -59,7 +56,7 @@ public class DispatchController {
 
     @GetMapping("/drones/{id}/battery")
     public String getDroneBatteryLevel(@PathVariable int id) {
-        Drone drone = droneRepository.findById(id).orElseThrow(() -> new DroneNotFoundException(id));
+        Drone drone = droneService.getDroneById(id);
 
         return "{ \"battery\": " + drone.getBatteryCapacity() + "%}" ;
 
@@ -67,23 +64,18 @@ public class DispatchController {
 
     @GetMapping("/drones/{id}")
     public EntityModel<Drone> getDrone(@PathVariable int id) {
-        return droneAssembler.toModel(
-                droneRepository
-                        .findById(id)
-                        .orElseThrow(() -> new DroneNotFoundException(id)));
+        return droneAssembler.toModel(droneService.getDroneById(id));
     }
 
     @PostMapping("/drones/{id}/items")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Set<Item> loadDrone(@PathVariable int id, @RequestBody List<Item> items) {
 
-        Drone drone = droneRepository.findById(id).orElseThrow(() -> new DroneNotFoundException(id));
+        Drone drone = droneService.getDroneById(id);
 
         if (!drone.isAvailable()) {
             throw new DroneNotAvailableException(id);
         }
-
-        drone.setId(drone.getId());
         float allowedMaxWeight = drone.getMaxWeight();
 
         float currentWeight = drone.getItems().stream().map(Item::getWeight).reduce(0f, Float::sum);
@@ -94,14 +86,14 @@ public class DispatchController {
             throw new DroneOverweightException(id);
         }
         drone.setState(DroneState.LOADING);
-        droneRepository.saveAndFlush(drone);
+        droneService.updateDrone(drone);
         for (Item i : items) {
             drone.addItem(i);
         }
 
-        itemRepository.saveAllAndFlush(items);
+        itemService.addItems(items);
         drone.setState(DroneState.LOADED);
-        Drone droneWithItems =  droneRepository.saveAndFlush(drone);
+        Drone droneWithItems =  droneService.updateDrone(drone);
         return droneWithItems.getItems();
     }
 
@@ -109,10 +101,10 @@ public class DispatchController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Set<Item> removeItemFromDrone(@PathVariable int id, @PathVariable Long itemId) {
 
-        Drone drone = droneRepository.findById(id).orElseThrow(() -> new DroneNotFoundException(id));
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NoItemFoundException(itemId));;
+        Drone drone = droneService.getDroneById(id);
+        Item item = itemService.getItem(itemId);
         drone.deleteItem(item);
-        Drone updated = droneRepository.save(drone);
+        Drone updated = droneService.updateDrone(drone);
 
         return updated.getItems();
     }
@@ -120,7 +112,7 @@ public class DispatchController {
     @PostMapping("/drones/{droneId}/dispatch")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Drone dispatchDrone(@PathVariable int droneId) {
-        Drone drone = droneRepository.findById(droneId).orElseThrow(() -> new DroneNotFoundException(droneId));
+        Drone drone = droneService.getDroneById(droneId);
 
         switch (drone.getState()) {
             case DELIVERED:
@@ -136,13 +128,12 @@ public class DispatchController {
             throw new LowBatteryException(droneId);
         }
         drone.setState(DroneState.DELIVERING);
-        return droneRepository.save(drone);
+        return droneService.updateDrone(drone);
     }
 
     @GetMapping("/drones/{id}/items")
     public Set<Item> getLoadedItems(@PathVariable int id) {
-        Drone drone = droneRepository.findById(id).orElseThrow(() -> new DroneNotFoundException(id));
-        return drone.getItems();
+        return droneService.getItemsOfDrone(id);
     }
 
 }

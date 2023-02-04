@@ -22,7 +22,7 @@ public class Item {
     private String image;
 
 //    @Column(name = "droneId")
-    @ManyToOne (cascade = CascadeType.REMOVE)
+    @ManyToOne (cascade = CascadeType.PERSIST)
     @JoinColumn (name = "drone_id", referencedColumnName = "id")
     @JsonBackReference
     private Drone drone;
