@@ -1,8 +1,6 @@
 package com.air.drone.transport.errorHandlers;
 
-import com.air.drone.transport.exceptions.DroneNotAvailableException;
-import com.air.drone.transport.exceptions.DroneNotFoundException;
-import com.air.drone.transport.exceptions.DroneOverweightException;
+import com.air.drone.transport.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,37 +16,110 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class DroneErrorHandler {
 
+    class ErrorMessage {
+        boolean error;
+        String message;
+
+        public ErrorMessage(){}
+
+        public boolean isError() {
+            return error;
+        }
+
+        public void setError(boolean error) {
+            this.error = error;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+
     Logger log = LoggerFactory.getLogger(DroneErrorHandler.class);
 
     @ResponseBody
     @ExceptionHandler(DroneNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String droneNotFoundHandler(DroneNotFoundException ex) {
+    ErrorMessage droneNotFoundHandler(DroneNotFoundException ex) {
         log.error("Drone not found", ex);
-        return ex.getMessage();
+        return buildError(ex.getMessage());
     }
 
     @ResponseBody
     @ExceptionHandler(DroneNotAvailableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    String droneNotAvailableHandler(DroneNotAvailableException ex) {
+    ErrorMessage droneNotAvailableHandler(DroneNotAvailableException ex) {
         log.error("Drone not available", ex);
-        return ex.getMessage();
+        return buildError(ex.getMessage());
     }
 
     @ResponseBody
     @ExceptionHandler(DroneOverweightException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    String droneOverweightHandler(DroneOverweightException ex) {
+    ErrorMessage droneOverweightHandler(DroneOverweightException ex) {
         log.error("Bad request", ex);
-        return ex.getMessage();
+        return buildError(ex.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     @ExceptionHandler(ConstraintViolationException.class)
-    String constraintViolationExceptionHandler(ConstraintViolationException ex) {
+    ErrorMessage constraintViolationExceptionHandler(ConstraintViolationException ex) {
         log.error("Bad request", ex);
-        return "{\"error\": true, \"message\": \" "+ ex.getConstraintViolations().stream().map(ConstraintViolation::getMessageTemplate).collect(Collectors.joining()) + "\" }";
+        return buildError(ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessageTemplate)
+                .collect(Collectors.joining()));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    @ExceptionHandler(LowBatteryException.class)
+    ErrorMessage lowBatteryExceptionHandler(LowBatteryException ex) {
+        log.error("Bad request", ex);
+        return buildError(ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    @ExceptionHandler(DroneIsNotLoadedException.class)
+    ErrorMessage droneNotLoadedExceptionHandler(DroneIsNotLoadedException ex) {
+        log.error("Bad request", ex);
+        return buildError(ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    @ExceptionHandler(DroneAlreadyDispatchedException.class)
+    ErrorMessage droneAlreadyDispatchedExceptionHandler(DroneAlreadyDispatchedException ex) {
+        log.error("Bad request", ex);
+        return buildError(ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    @ExceptionHandler(org.hibernate.exception.ConstraintViolationException.class)
+    ErrorMessage droneAlreadyDispatchedExceptionHandler(org.hibernate.exception.ConstraintViolationException ex) {
+        log.error("Bad request", ex);
+        return buildError("Conflict");
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    @ExceptionHandler(NoItemFoundException.class)
+    ErrorMessage itemNotFound(NoItemFoundException ex) {
+        log.error("Bad request", ex);
+        return buildError(ex.getMessage());
+    }
+
+    private ErrorMessage buildError(String message) {
+        ErrorMessage error = new ErrorMessage();
+        error.setError(true);
+        error.setMessage(message);
+        return error;
     }
 }

@@ -1,4 +1,7 @@
-package com.air.drone.transport.entities;
+package com.air.drone.transport.item;
+
+import com.air.drone.transport.drone.Drone;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
@@ -9,7 +12,7 @@ public class Item {
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Id
-    private long itemId;
+    private long id;
     @Pattern(regexp = "([a-zA-Z1-9-_]*)", message = "Item name should only contain letters, numbers, - and _")
     private String name;
 
@@ -18,25 +21,27 @@ public class Item {
     private float weight;
     private String image;
 
-    @Column(name = "droneId")
-    private int droneId;
+//    @Column(name = "droneId")
+    @ManyToOne (cascade = CascadeType.REMOVE)
+    @JoinColumn (name = "drone_id", referencedColumnName = "id")
+    @JsonBackReference
+    private Drone drone;
 
     public Item() {}
 
-    public Item(String name, String code, float weight, String image, int droneId) {
+    public Item(String name, String code, float weight, String image) {
         this.name = name;
         this.code = code;
         this.weight = weight;
         this.image = image;
-        this.droneId = droneId;
     }
 
-    public long getItemId() {
-        return this.itemId;
+    public long getId() {
+        return this.id;
     }
 
-    public void setItemId(long itemId) {
-        this.itemId = itemId;
+    public void setId(long itemId) {
+        this.id = itemId;
     }
 
     public String getName() {
@@ -69,5 +74,12 @@ public class Item {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public void setDrone(Drone drone) {
+        this.drone = drone;
+    }
+    public Drone getDrone() {
+        return drone;
     }
 }

@@ -1,8 +1,9 @@
 package com.air.drone.transport.runners;
 
-import com.air.drone.transport.entities.Drone;
-import com.air.drone.transport.entities.DroneState;
-import com.air.drone.transport.repositories.DroneRepository;
+import com.air.drone.transport.drone.Drone;
+import com.air.drone.transport.drone.DroneRepository;
+import com.air.drone.transport.drone.DroneState;
+import com.air.drone.transport.item.ItemRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,8 +17,11 @@ public class DroneStatusChecker {
     private static final Logger log = LoggerFactory.getLogger(DroneStatusChecker.class);
     private final DroneRepository droneRepository;
 
-    public DroneStatusChecker(DroneRepository droneRepository) {
+    private final ItemRepository itemRepository;
+
+    public DroneStatusChecker(DroneRepository droneRepository, ItemRepository itemRepository) {
         this.droneRepository = droneRepository;
+        this.itemRepository = itemRepository;
     }
 
     @Scheduled(fixedRate = 10000)
@@ -49,13 +53,11 @@ public class DroneStatusChecker {
             Drone drone = new Drone(d.getModel(), d.getBatteryCapacity(), d.getSerialNumber());
             drone.setId(d.getId());
             switch (d.getState()) {
-                case LOADED:
-                    drone.setState(DroneState.DELIVERING);
-                    updatedDrones.add(drone);
-                    break;
                 case DELIVERED:
-                    drone.setState(DroneState.RETURNING);
-                    updatedDrones.add(drone);
+                    d.setState(DroneState.RETURNING);
+                    d.deleteAllItems();
+                    System.out.println(d);
+                    updatedDrones.add(d);
                     break;
                 case DELIVERING:
                     drone.setState(DroneState.DELIVERED);
@@ -63,7 +65,7 @@ public class DroneStatusChecker {
                     break;
                 case RETURNING:
                     drone.setState(DroneState.IDLE);
-                    updatedDrones.add(drone);
+                    droneRepository.save(drone);
                     break;
                 default:
                     break;

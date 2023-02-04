@@ -1,6 +1,5 @@
-package com.air.drone.transport.repositories;
+package com.air.drone.transport.item;
 
-import com.air.drone.transport.entities.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {

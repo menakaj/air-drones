@@ -1,4 +1,4 @@
-package com.air.drone.transport.entities;
+package com.air.drone.transport.drone;
 
 public enum DroneState {
     IDLE,

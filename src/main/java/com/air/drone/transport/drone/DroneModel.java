@@ -1,4 +1,4 @@
-package com.air.drone.transport.entities;
+package com.air.drone.transport.drone;
 
 public enum DroneModel {
     LIGHT_WEIGHT(200),
