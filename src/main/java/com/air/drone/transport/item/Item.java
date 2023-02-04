@@ -13,15 +13,17 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Id
     private long id;
+
     @Pattern(regexp = "([a-zA-Z1-9-_]*)", message = "Item name should only contain letters, numbers, - and _")
     private String name;
 
     @Pattern(regexp = "([A-Z1-9_]*)", message = "Item code should contain only capital letters and _")
     private String code;
+
     private float weight;
+
     private String image;
 
-//    @Column(name = "droneId")
     @ManyToOne (cascade = CascadeType.PERSIST)
     @JoinColumn (name = "drone_id", referencedColumnName = "id")
     @JsonBackReference

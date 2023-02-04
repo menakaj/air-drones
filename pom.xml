@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.air.drone</groupId>
-	<artifactId>transport</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>transport</name>
+	<artifactId>drone-delivery</artifactId>
+	<version>1.0.0</version>
+	<name>delivery</name>
 	<description>Drone based delivery service</description>
 	<properties>
 		<java.version>11</java.version>

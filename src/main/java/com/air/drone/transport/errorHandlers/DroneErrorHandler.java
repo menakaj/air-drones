@@ -9,14 +9,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class DroneErrorHandler {
 
-    class ErrorMessage {
+    static class ErrorMessage {
         boolean error;
         String message;
 
@@ -72,7 +71,11 @@ public class DroneErrorHandler {
         log.error("Bad request", ex);
         return buildError(ex.getConstraintViolations()
                 .stream()
-                .map(ConstraintViolation::getMessageTemplate)
+                .map(constraintViolation -> {
+                    final String s = constraintViolation.getPropertyPath().toString() + " "
+                            + constraintViolation.getMessage();
+                    return s;
+                })
                 .collect(Collectors.joining()));
     }
 

@@ -4,6 +4,7 @@ import com.air.drone.transport.item.Item;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,12 +16,22 @@ public class Drone {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     Integer id;
+
     @Column(length = 100, name = "serial_number", unique = true)
     @Size(max = 100, message = "Serial number exceeds 100 characters")
     private String serialNumber;
 
-    private DroneModel model;
+    @NotNull
+    @DroneModelSubset(anyOf = {
+            DroneModelType.HEAVY_WEIGHT,
+            DroneModelType.LIGHT_WEIGHT,
+            DroneModelType.CRUISER_WEIGHT,
+            DroneModelType.MIDDLE_WEIGHT
+    })
+    private DroneModelType model;
+
     private DroneState state = DroneState.IDLE;
+
     private double batteryCapacity;
 
     @OneToMany(
@@ -40,11 +51,12 @@ public class Drone {
 
     public Drone(){}
 
-    public Drone(DroneModel model, double batteryCapacity, String serialNumber) {
+    public Drone(DroneModelType model, double batteryCapacity, String serialNumber) {
         this.model = model;
         this.batteryCapacity =  batteryCapacity;
         this.serialNumber = serialNumber;
     }
+
     public Integer getId() {
         return id;
     }
@@ -61,7 +73,6 @@ public class Drone {
         this.serialNumber = serialNumber;
     }
 
-
     public double getBatteryCapacity() {
         return batteryCapacity;
     }
@@ -70,11 +81,11 @@ public class Drone {
         this.batteryCapacity = batteryCapacity;
     }
 
-    public DroneModel getModel() {
+    public DroneModelType getModel() {
         return model;
     }
 
-    public void setModel(DroneModel model) {
+    public void setModel(DroneModelType model) {
         this.model = model;
     }
 

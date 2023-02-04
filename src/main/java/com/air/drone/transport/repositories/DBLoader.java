@@ -1,7 +1,7 @@
 package com.air.drone.transport.repositories;
 
 import com.air.drone.transport.drone.Drone;
-import com.air.drone.transport.drone.DroneModel;
+import com.air.drone.transport.drone.DroneModelType;
 import com.air.drone.transport.drone.DroneRepository;
 import com.air.drone.transport.item.Item;
 import com.air.drone.transport.item.ItemRepository;
@@ -26,9 +26,9 @@ public class DBLoader {
     @Bean
     CommandLineRunner initDatabase(DroneRepository droneRepository, ItemRepository itemRepository) {
         return args -> {
-            log.info("Adding drone " + droneRepository.save(new Drone(DroneModel.HEAVY_WEIGHT, 20.3, "ZSSZSJFU_DHJ234")));
-            log.info("Adding drone " + droneRepository.save(new Drone(DroneModel.MIDDLE_WEIGHT, 100.0, "ZAAZSJFU_DESF4")));
-            log.info("Adding drone " + droneRepository.save(new Drone(DroneModel.LIGHT_WEIGHT, 80.3, "SSDFFFU_DHJ234")));
+            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.HEAVY_WEIGHT, 20.3, "ZSSZSJFU_DHJ234")));
+            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.MIDDLE_WEIGHT, 100.0, "ZAAZSJFU_DESF4")));
+            log.info("Adding drone " + droneRepository.save(new Drone(DroneModelType.LIGHT_WEIGHT, 80.3, "SSDFFFU_DHJ234")));
             log.info("Adding item " + itemRepository.save(new Item("Sugar", "S123", 1500, "")));
             log.info("Adding item " + itemRepository.save(new Item("Vaccine", "V12_EDDE", 11, "")));
         };

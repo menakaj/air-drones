@@ -3,7 +3,7 @@ package com.air.drone.transport;
 import com.air.drone.transport.assemblers.DroneAssembler;
 import com.air.drone.transport.controllers.DispatchController;
 import com.air.drone.transport.drone.Drone;
-import com.air.drone.transport.drone.DroneModel;
+import com.air.drone.transport.drone.DroneModelType;
 import com.air.drone.transport.drone.DroneService;
 import com.air.drone.transport.item.ItemService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +36,10 @@ public class DispatchControllerTest {
 
     @Test
     public void testRegisterDrone() {
-        Drone mockDrone = new Drone(DroneModel.HEAVY_WEIGHT, 100.0, "DRONE_1");
+        Drone mockDrone = new Drone(DroneModelType.HEAVY_WEIGHT, 100.0, "DRONE_1");
         mockDrone.setId(1);
         Mockito.when(droneService.addDrone(Mockito.any(Drone.class))).thenReturn(mockDrone);
-        Drone drone = new Drone(DroneModel.HEAVY_WEIGHT, 100.0, "DRONE_1");
+        Drone drone = new Drone(DroneModelType.HEAVY_WEIGHT, 100.0, "DRONE_1");
         EntityModel<Drone> droneEntityModel = dispatchController.registerDrone(drone);
         Assert.isTrue(droneEntityModel != null);
     }

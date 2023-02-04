@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -25,7 +24,7 @@ public class DroneStatusChecker {
     }
 
     @Scheduled(fixedRate = 10000)
-    public void updateBatteryCapasity() {
+    public void updateBatteryCapacity() {
         List<Drone> drones = droneService.getDrones(null);
 
         for(Drone d : drones) {
@@ -41,17 +40,22 @@ public class DroneStatusChecker {
         List<Drone> drones = droneService.getDrones(null);
 
         for(Drone d : drones) {
-            log.info(String.format("Status of drone: %s id: %d state: %s batery : %.2f", d.getSerialNumber(), d.getId(), d.getState().name(), d.getBatteryCapacity() ));
+            log.info(
+                    String.format(
+                            "Status of drone: %s id: %d state: %s battery : %.2f",
+                            d.getSerialNumber(),
+                            d.getId(),
+                            d.getState().name(),
+                            d.getBatteryCapacity()
+                    )
+            );
         }
     }
 
     @Scheduled(fixedRate = 5000)
     public void runDelivery() {
         List<Drone> drones = droneService.getDrones(null);
-        List<Drone> updatedDrones = new ArrayList<>();
         for(Drone d : drones) {
-//            Drone drone = new Drone(d.getModel(), d.getBatteryCapacity(), d.getSerialNumber());
-//            drone.setId(d.getId());
             switch (d.getState()) {
                 case DELIVERED:
                     d.setState(DroneState.RETURNING);

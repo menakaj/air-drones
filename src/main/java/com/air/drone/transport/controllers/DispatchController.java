@@ -58,7 +58,7 @@ public class DispatchController {
     public String getDroneBatteryLevel(@PathVariable int id) {
         Drone drone = droneService.getDroneById(id);
 
-        return "{ \"battery\": " + drone.getBatteryCapacity() + "%}" ;
+        return "{\"battery\": \"" + drone.getBatteryCapacity() + "%\"}" ;
 
     }
 
@@ -69,7 +69,7 @@ public class DispatchController {
 
     @PostMapping("/drones/{id}/items")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Set<Item> loadDrone(@PathVariable int id, @RequestBody List<Item> items) {
+    public EntityModel<Drone> loadDrone(@PathVariable int id, @RequestBody List<Item> items) {
 
         Drone drone = droneService.getDroneById(id);
 
@@ -94,7 +94,7 @@ public class DispatchController {
         itemService.addItems(items);
         drone.setState(DroneState.LOADED);
         Drone droneWithItems =  droneService.updateDrone(drone);
-        return droneWithItems.getItems();
+        return droneAssembler.toModel(droneWithItems);
     }
 
     @DeleteMapping("/drones/{id}/items/{itemId}")
