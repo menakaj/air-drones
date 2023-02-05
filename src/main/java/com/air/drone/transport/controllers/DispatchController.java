@@ -12,6 +12,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,8 +44,8 @@ public class DispatchController {
 
     @GetMapping("/drones")
     public CollectionModel<EntityModel<Drone>> getDrones(
-            @RequestParam(required = false, name = "available") String available) {
-        List<EntityModel<Drone>> drones = droneService.getDrones(available)
+            @RequestParam(required = false, name = "status") String status) {
+        List<EntityModel<Drone>> drones = droneService.getDrones(status)
                 .stream()
                 .map(droneAssembler::toModel)
                 .collect(Collectors.toList());
@@ -69,6 +70,7 @@ public class DispatchController {
 
     @PostMapping("/drones/{id}/items")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @Transactional
     public EntityModel<Drone> loadDrone(@PathVariable int id, @RequestBody List<Item> items) {
 
         Drone drone = droneService.getDroneById(id);

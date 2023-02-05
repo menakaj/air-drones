@@ -38,7 +38,7 @@ public class Drone {
     private BigDecimal batteryCapacity;
 
     @OneToMany(
-            cascade = CascadeType.PERSIST,
+            cascade = CascadeType.MERGE,
             fetch = FetchType.EAGER,
             mappedBy = "drone",
             orphanRemoval = true

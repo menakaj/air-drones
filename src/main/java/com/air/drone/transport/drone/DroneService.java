@@ -21,12 +21,12 @@ public class DroneService {
         return droneRepository.findById(id).orElseThrow(() -> new DroneNotFoundException(id));
     }
 
-    public List<Drone> getDrones(String availability) {
+    public List<Drone> getDrones(String status) {
         return droneRepository.findAll().stream().filter(drone -> {
-            if (availability == null) {
+            if (status == null) {
                 return true;
             }
-            return !"true".equalsIgnoreCase(availability) || drone.isAvailable();
+            return !"available".equalsIgnoreCase(status) || drone.isAvailable();
         }).collect(Collectors.toList());
     }
 

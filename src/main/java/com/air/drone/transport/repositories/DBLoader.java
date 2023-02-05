@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 
 @Configuration
 public class DBLoader {
+
     private static final Logger log = LoggerFactory.getLogger(DBLoader.class);
 
     private final DroneRepository droneRepository;

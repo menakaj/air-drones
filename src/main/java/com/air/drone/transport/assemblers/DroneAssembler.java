@@ -16,7 +16,8 @@ public class DroneAssembler implements RepresentationModelAssembler<Drone, Entit
         return EntityModel.of(
                 drone,
                 linkTo(methodOn(DispatchController.class).getDrone(drone.getId())).withRel("self"),
-                linkTo(methodOn(DispatchController.class).getLoadedItems(drone.getId())).withRel("items")
+                linkTo(methodOn(DispatchController.class).getLoadedItems(drone.getId())).withRel("items"),
+                linkTo(methodOn(DispatchController.class).dispatchDrone(drone.getId())).withRel("dispatch")
                 );
     }
 }

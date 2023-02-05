@@ -67,7 +67,7 @@ Response
 Request
 
 ```
-curl -X GET http://localhost:8080/dispatcher/v1/drones?available=true
+curl -X GET http://localhost:8080/dispatcher/v1/drones?status=available
 ```
 
 Response
@@ -134,7 +134,7 @@ Response
     },
     "_links": {
         "self": {
-            "href": "http://localhost:8080/dispatcher/v1/drones?available=true"
+            "href": "http://localhost:8080/dispatcher/v1/dronesdrones?status=available"
         }
     }
 }
