@@ -7,6 +7,11 @@ This system allows to register your drone, add items to the drone and dispatch i
 1. Once delivered the items will be removed from the system.
 2. Location is set by the system internally
 3. The drone's battery level will not degrade when it's idle. But discharges if it's on move.
+4. 10 drones are pre-registered in the system
+5. Items should be loaded to the drones
+6. Once loaded the drone can be dispatched.
+7. Dispatched drone will be picked up by a timer task to complete the delivery
+8. The application logs will be printed to application.log file
 
 ## Usage
 
